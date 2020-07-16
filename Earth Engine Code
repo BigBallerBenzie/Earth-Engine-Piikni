@@ -1,0 +1,26 @@
+var geometry = 
+    /* color: #98ff00 */
+    /* shown: false */
+    ee.Geometry.Polygon(
+        [[[-105.4723, 45.6072],
+          [-105.4723, 49.8914],
+          [-115.3397, 49.8914],
+          [-115.3397, 45.6072]]]);
+
+var landsat = ee.ImageCollection("LANDSAT/LC08/C01/T1").select(['B4'])
+            .filterBounds(geometry)//select all images, touch the 'region'
+            .filterMetadata('CLOUD_COVER', 'less_than', 30);
+            //.sort('CLOUD_COVER', false)//sort image by
+            //'CLOUD_COVER': cloud cover properties name
+            
+               Map.addLayer(landsat.median().clip(geometry),{}, 'Piikni_Raw_B4', true);
+
+Export.image.toDrive({
+  image: landsat.median().select(['B4', 'B3', 'B2']),
+  description: 'Pikkini_Raw',
+  scale: 30,
+  region: geometry,
+  maxPixels: 6.2e10,
+});
+//Map.centerObject(geometry);
+//Map.addLayer(geometry, {color: 'FF0000'});
